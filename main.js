@@ -15,17 +15,19 @@ function templateHTML(title, list, body){
             ${list}
             ${body}        
         </body>
-        </html>    
-    `
+        </html>`
 };
 
 function templateList(filelist){
     var list = '<ul>';
     var i = 0;
     while(i<filelist.length){
-        list += '<li><a href="/?id=&{filelist[i]">${filelist[i]}</a></li>';
-
+        list += `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
+        i+=1;
     }
+    list+='</ul>'
+
+    return list;
 
 };
 
@@ -39,64 +41,22 @@ var app = http.createServer((request,response)=>{
         if(queryData.id === undefined){
             fs.readdir('./data', (error, filelist)=>{
                 // console.log(filelist);
-                var i = 0;
+                // var i = 0;
                 var title = 'Welcome';
                 var description = "Hell Node.js";
-                var list = '<ul>';
-                while(i<filelist.length){
-                    list+=`<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`
-                    i+=1;
-                }
-
-                list+='</ul>'
-                var template = `
-                    <!doctype html>
-                    <html>
-                    <head>
-                    <title>WEB1 - ${title}</title>
-                    <meta charset="utf-8">
-                    </head>
-                    <body>
-                    <h1><a href="/">WEB</a></h1>
-                    ${list}
-                    <h2>${title}</h2>
-                    <p>${description}
-                    </p>
-                    </body>
-                    </html>`;
+                var list = templateList(filelist);
+                var template = templateHTML(title, list, `<h2>${title}</h2><p>${description}`);
                 response.writeHead(200);
                 response.end(template);
             });
         }else{
             fs.readdir('./data', (error, filelist)=>{
-                console.log(filelist);
-                var i = 0;
-                var title = 'Welcome';
-                var description = "Hell Node.js";
-                var list = '<ul>';
-                while(i<filelist.length){
-                    list+=`<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`
-                    i+=1;
-                }
-
-                list+='</ul>';
+                // console.log(filelist);
+                var list = templateList(filelist);
                 fs.readFile(`data/${queryData.id}`, 'utf8', (err, description)=>{
                     var title = queryData.id;
-                    var template = `
-                        <!doctype html>
-                        <html>
-                        <head>
-                        <title>WEB1 - ${title}</title>
-                        <meta charset="utf-8">
-                        </head>
-                        <body>
-                        <h1><a href="/">WEB</a></h1>
-                        ${list}
-                        <h2>${title}</h2>
-                        <p>${description}
-                        </p>
-                        </body>
-                        </html>`;
+                    var template = templateHTML(title, list, `<h2>${title}</h2><p>${description}`);
+
                     response.writeHead(200);
                     response.end(template);
                 });
